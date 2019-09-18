@@ -9,7 +9,6 @@
     <script src="tooltip.js"></script>
     <script src="confirm-link.js"></script>
     <script src="modal.js"></script>
-    <link rel="stylesheet" href="index.css">
 </head>
 
 <body>
@@ -25,11 +24,14 @@
         <a is="sk-confirm-link" href="https://www.google.com">Google</a>
     </div>
     <div>
-        <sk-modal></sk-modal>
+        <sk-modal>
+            <h1 slot="title">Please confirm</h1>
+            <p>Some content</p>
+        </sk-modal>
         <p>Modal window</p>
-        <button>Open modal</button>
+        <button id="open-modal">Open modal</button>
     </div>
-
+    <script src="index.js"></script>
 </body>
 
 </html>

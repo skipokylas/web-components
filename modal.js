@@ -6,6 +6,7 @@ class Modal extends HTMLElement {
             <style>
                 header {
                     padding: 1rem;
+                    border-bottom: 1px solid #ccc;
                 }
 
                 header h1 {
@@ -20,12 +21,24 @@ class Modal extends HTMLElement {
                     height: 100vh;
                     background: rgba(0,0,0,0.75);
                     z-index: 10;
+                    opacity: 0;
+                    pointer-events: none;
+                }
+
+                :host([opened]) #backdrop,
+                :host([opened]) #modal {
+                    opacity: 1;
+                    pointer-events: all;
+                }
+
+                :host([opened]) #modal {
+                    top: 15vh;
                 }
 
                 #modal {
                     z-index: 100;
                     position: fixed;
-                    top: 15vh;
+                    top: 10vh;
                     left: 25%;
                     width: 50%;
                     background: white;
@@ -34,6 +47,8 @@ class Modal extends HTMLElement {
                     display: flex;
                     flex-direction: column;
                     justify-content: space-between;
+                    opacity: 0;
+                    transition: all 0.3s ease-out;
                 }
 
                 #main {
@@ -50,21 +65,60 @@ class Modal extends HTMLElement {
                 #actions button {
                     margin: 0 .25rem;
                 }
+
+                ::slotted(h1) {
+                    font-size: 1.25rem;
+                    margin: 0;
+                }
             </style>
             <div id="backdrop"></div>
             <div id="modal">
                 <header>
-                    <h1>Please Confirm</h1>
+                   <slot name="title"></slot>
                 </header>
                 <section id="main">
                     <slot></slot>
                 </section>
                 <section id="actions">
-                    <button>Cancel</button>
-                    <button>Ok</button>
+                    <button id="cancel-btn">Cancel</button>
+                    <button id="confirm-btn">Ok</button>
                 </section>
             </div>
         `;
+
+        this.initListeners();
+    }
+
+    initListeners() {
+        const cancelBtn = this.shadowRoot.querySelector('#cancel-btn');
+        const confirmBtn = this.shadowRoot.querySelector('#confirm-btn');
+        const backdrop = this.shadowRoot.querySelector('#backdrop');
+
+        cancelBtn.addEventListener('click', this._cancel.bind(this));
+        confirmBtn.addEventListener('click', this._confirm.bind(this));
+        backdrop.addEventListener('click', this._confirm.bind(this));
+    }
+
+    open() {
+        this.setAttribute('opened', '');
+    }
+
+    hide() {
+        if (this.hasAttribute('opened')) {
+            this.removeAttribute('opened');
+        }
+    }
+
+    _cancel() {
+        this.hide();
+        const cancelEvent = new Event('cancel', { composed: true });
+        this.dispatchEvent(cancelEvent);
+    }
+
+    _confirm() {
+        this.hide();
+        const confirmEvent = new Event('confirm', { composed: true });
+        this.dispatchEvent(confirmEvent);
     }
 
 }
